@@ -17,9 +17,10 @@ import { ToastContainer } from 'react-toastify'
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { checkAuthenticatedUser } from './redux/slice/authSlice';
-import { useEffect } from 'react';  
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AddProduct from './pages/AdminPages/AddProduct';
+import EditPage from './pages/AdminPages/EditPage';
 const App = () => {
 
 
@@ -33,17 +34,29 @@ const App = () => {
   useEffect(() => {
 
     dispatch(checkAuthenticatedUser())
-    .then((res)=>{
-      console.log(res);  
-      
-      if(!res.payload.success){
-        toast.error("Session Expired! Please login again.");
-        navigate("/login");
-      } 
-    });
+      .then((res) => {
+        // console.log(res);  
 
-    navigate("/shop");
-    
+        if (!res.payload.success) {
+          toast.error("Session Expired! Please login again.");
+          navigate("/login");
+        }
+
+        if (res.payload.success) {
+          const user = res.payload.user?.role; // <-- get role from API response
+
+          if (user === 'admin') {
+            navigate("/admin");
+          } else {
+            navigate("/shop");
+          }
+        }
+      });
+
+    console.log(user);
+
+
+
   }, [dispatch]);
 
   return (
@@ -69,6 +82,7 @@ const App = () => {
           <Route path="orders" element={<Orders />}></Route>
           <Route path="products" element={<Products />}></Route>
           <Route path="add-product" element={<AddProduct />}></Route>
+          <Route path='edit-product' element={<EditPage />}></Route>
         </Route>
 
         <Route path="/shop" element={

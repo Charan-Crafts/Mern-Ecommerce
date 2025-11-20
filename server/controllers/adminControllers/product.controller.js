@@ -1,13 +1,12 @@
 const { uploadToCloudinary, deleteFromCloudinary } = require("../../config/Cloudinary")
 const productModel = require("../../models/product.model");
 const addNewProduct = async (req, res) => {
-    const { productName, productDescription, productPrice, productCategory, stock } = req.body;
+    const { productName, productDescription, productPrice, productCategory, productStock } = req.body;
 
     const file = req.file.path;
 
 
-    try {
-
+    try {   
 
         const user = req.user;
 
@@ -30,7 +29,8 @@ const addNewProduct = async (req, res) => {
             productPrice,
             productCategory,
             image: cloudinaryResponse,
-            stockQuantity: stock
+            stockQuantity: productStock,
+            productCategory
         }
 
         const newProduct = await productModel.create(productRequest);
@@ -78,7 +78,8 @@ const deleteProduct = async (req, res) => {
 
         return res.status(200).json({
             message: "Product deleted successfully",
-            success: true
+            success: true,
+            data:deletedProduct._id
         })
 
     } catch (error) {
@@ -147,6 +148,8 @@ const updateProductImage = async (req, res) => {
 
     const productId = req.params.id;
 
+    console.log(req.file,productId);
+    
     const file = req.file.path;
 
     try {
@@ -171,6 +174,10 @@ const updateProductImage = async (req, res) => {
         // Now store the new Image to cloudinary
 
         const cloudinaryResponse = await uploadToCloudinary(file);
+        // console.log("Clodu");
+        
+        console.log(cloudinaryResponse);
+        
 
         findProduct.image = cloudinaryResponse;
 
@@ -198,17 +205,7 @@ const getAllProducts = async (req, res) => {
 
     try {
 
-        const user = req.user;
-
-        if (user.role !== "admin") {
-
-            return res.status(403).json({
-                message: "Access denied. Admins only.",
-                success: false
-            });
-        }
-
-        console.log(user);
+        
 
         const products = await productModel.find({});
 

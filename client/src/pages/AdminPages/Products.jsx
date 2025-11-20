@@ -1,13 +1,29 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import AdminProductComponent from "../../components/AdminComponents/AdminProductComponent";
-
+import {useDispatch,useSelector} from "react-redux";
+import { useEffect } from "react";
+import { getAllProducts } from "../../redux/slice/adminProductSlice";
 const Products = () => {
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const {productList} = useSelector((state)=>state.adminProduct)
 
   const handleAddNewProduct = () => {
     navigate("/admin/add-product");
   };
+
+  console.log(productList);
+  
+
+  useEffect(()=>{
+    dispatch(getAllProducts())
+    .then((res)=>{
+      // console.log(res);
+    });
+  },[dispatch]);
 
   return (
     <div className="bg-gray-400 min-h-screen mt-4 p-4 flex flex-col">
@@ -34,8 +50,12 @@ const Products = () => {
       </div>
 
       {/* Product list */}
-      <div className="bg-gray-50 mt-3">
-        <AdminProductComponent />
+      <div className="bg-gray-50 mt-3 grid grid-cols-4 gap-4 p-4 rounded-2xl shadow-lg overflow-y-auto">
+        {
+          productList.map((product)=>{
+            return <AdminProductComponent productDetails ={product}/>
+          })
+        }
       </div>
     </div>
   );

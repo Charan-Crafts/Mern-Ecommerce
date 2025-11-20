@@ -16,7 +16,7 @@ const uploadToCloudinary = async(filePath)=>{
 
         const response = await cloudinary.uploader.upload(filePath);
 
-        console.log("response from cloudinary",response);
+        // console.log("response from cloudinary",response);
 
 
         fs.unlinkSync(filePath); //deleting the file from local storage after uploading to cloudinary

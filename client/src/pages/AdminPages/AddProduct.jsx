@@ -1,11 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-toastify"
+import { toast } from "react-toastify"
+import { useDispatch, useSelector } from "react-redux"
+import { addNewProduct, getAllProducts } from "../../redux/slice/adminProductSlice";
+import LoaderOverlay from "../../components/LoaderOverlay";
 
 const AddProduct = () => {
   const navigate = useNavigate();
 
   const [imagePreview, setImagePreview] = useState(null);
+
+  const { isLoading } = useSelector((state) => state.adminProduct)
+
+
+  const dispatch = useDispatch();
 
   const [productData, setProductData] = useState({
     productName: "",
@@ -13,7 +21,7 @@ const AddProduct = () => {
     productPrice: "",
     productCategory: "",
     productStock: "",
-    image: null
+    productImage: null
   });
 
   const categories = [
@@ -38,7 +46,7 @@ const AddProduct = () => {
     const file = e.target.files[0];
 
     if (file) {
-      setProductData({ ...productData, image: file });
+      setProductData({ ...productData, productImage: file });
       setImagePreview(URL.createObjectURL(file));
     } else {
       setImagePreview(null);
@@ -48,14 +56,33 @@ const AddProduct = () => {
   const handleProductSubmittion = (e) => {
     e.preventDefault();
     console.log(productData);
-    
-    navigate("/admin/products");
-    toast.success("Product added successfully!"); 
-    setProductData({});
+    dispatch(addNewProduct(productData))
+      .then((res) => {
+        console.log(res.payload.success);
+        if(res.payload.success){
+          dispatch(getAllProducts());
+          navigate("/admin/products");
+          toast.success("Product added successfully!"); 
+          setProductData({});
+          return;
+        }else{
+          const error = res.payload;
+          toast.error(error);
+        }
+      })
+
+    // navigate("/admin/products");
+    // toast.success("Product added successfully!"); 
+    // setProductData({});
   };
 
+  
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col p-6 gap-6">
+
+      {isLoading &&(
+        <LoaderOverlay/>
+      )}
 
       {/* Header */}
       <div className="flex items-center justify-between p-6 bg-white rounded-2xl shadow-lg">
