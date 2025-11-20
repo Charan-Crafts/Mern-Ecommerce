@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Styles the entire scrollbar */
+::-webkit-scrollbar {
+  display: none; /* Background for the scrollbar area */
+}
